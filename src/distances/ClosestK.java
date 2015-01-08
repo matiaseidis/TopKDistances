@@ -29,18 +29,19 @@ public class ClosestK {
 		ExecutorService pool = Executors.newFixedThreadPool(threads);
 		List<Future> results = new LinkedList<>();
 		int segment = n/threads;
+		long ini = System.currentTimeMillis();
+		logBegin(hotels, k, threads);
 		for(int i=0; i<n; i+=segment) {
 			int from = i;
 			int to = i + segment - 1;
 			results.add(pool.submit(() -> {
-				long ini = System.currentTimeMillis();
-				logBegin(from, to, hotels);
 				new ClosestK(n, k, from, to, hotels);
-				logEnd(n, k, ini);
+				logSegment(from, to);
 			}));
 		}
 		for(Future f : results)
 			f.get(2, TimeUnit.HOURS);
+		logEnd(n, k, ini);
 		pool.shutdown();
 	}
 
@@ -136,16 +137,20 @@ public class ClosestK {
 		hotels[j] = temp;
 	}
 	
-	private static void logBegin(int from, int to, Hotel[] hotels) {
-		System.out.println(String.format("segment between %sand %s h of a total of %s h", from, to, hotels.length));
+	private static void logBegin(Hotel[] hotels, int k, int threads) {
+		System.out.println(String.format("START | n=%s  and k=%s. threads: %s", hotels.length, k, threads));
+	}
+	
+	private static void logSegment(int from, int to) {
+		System.out.println(String.format("done segment[%s...%s]", from, to));
 	}
 	
 	private void logStep(int i, long ini) {
-		if (i % 100 == 0) System.out.println(String.format("tooked for id [%s]: %s ms", i, System.currentTimeMillis() - ini));
+		if (i % 500 == 0) System.out.println(String.format("for id [%s]: %s ms", i, System.currentTimeMillis() - ini));
 	}
 	
 	private static void logEnd(int n, int k, long ini) {
-		System.out.println(String.format("for n = %s and k = %s, tooked: %s ms", n, k, System.currentTimeMillis() - ini));
+		System.out.println(String.format("END   | n=%s and k=%s, tooked: %s ms", n, k, System.currentTimeMillis() - ini));
 	}
 }
 
