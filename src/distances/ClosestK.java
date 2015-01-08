@@ -23,8 +23,7 @@ public class ClosestK {
 		int threads = 4;
 
 		Random r = new Random();
-		Hotel[] hotels = new Hotel[n];
-		IntStream.range(0, n).forEach(i -> hotels[i] = new Hotel(i, r));
+		Hotel[] hotels = (Hotel[]) IntStream.range(0, n).mapToObj(i-> new Hotel(i, r)).toArray();
 
 		ExecutorService pool = Executors.newFixedThreadPool(threads);
 		List<Future> results = new LinkedList<>();
@@ -45,11 +44,11 @@ public class ClosestK {
 		pool.shutdown();
 	}
 
-	public ClosestK(int N, int k, int from, int to, Hotel[] hotels) {
+	public ClosestK(int n, int k, int from, int to, Hotel[] hotels) {
 
-		float[] distances = new float[N];
-		int[] hotelIndexes = new int[N];
-		IntStream.range(0, N).forEach(i -> hotelIndexes[i] = i);
+		float[] distances = new float[n];
+		int[] hotelIndexes = new int[n];
+		IntStream.range(0, n).forEach(i -> hotelIndexes[i] = i);
 
 		try (final FileWriter fw = new FileWriter(new File("result.csv"))) {
 			
