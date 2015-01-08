@@ -24,7 +24,7 @@ public class ClosestK {
 		int threads = 4;
 
 		Random r = new Random();
-		Hotel[] hotels = (Hotel[]) IntStream.range(0, n).mapToObj(i-> new Hotel(i, r)).toArray();
+		Hotel[] hotels = IntStream.range(0, n).mapToObj(i-> new Hotel(i, r)).toArray(Hotel[]::new);
 
 		ExecutorService pool = Executors.newFixedThreadPool(threads);
 		List<Future> results = new LinkedList<>();
@@ -63,9 +63,14 @@ public class ClosestK {
 				// calculate top k nearest on hotelIndexes
 				topK(k, hotelIndexes, distances);
 				// sort the top k nearest
-				Arrays.sort(hotelIndexes, 0, k+1);
+				Integer[] topKIndexes = Arrays
+						.stream(hotelIndexes)
+						.boxed()
+						.limit(k)
+						.sorted((a,b) -> Float.compare(distances[a],distances[b]))
+						.toArray(Integer[]::new);
 				// print result
-				writeToCSV(k, fw, h.id, hotelIndexes);
+				writeToCSV(k, fw, h.id, topKIndexes);
 
 				logStep(i, ini);
 					
@@ -85,12 +90,12 @@ public class ClosestK {
 				});
 	}
 
-	private void writeToCSV(int k, FileWriter fw, int hotelId, int[] hotels) {
+	private void writeToCSV(int k, FileWriter fw, int hotelId, Integer[] hotels) {
 		try {
 			fw.append(Integer.toString(hotelId));
 			fw.append(',');
 			for (int i = 0; i < k; i++) {
-				fw.append(Integer.toString(hotels[i]));
+				fw.append(hotels[i].toString());
 				fw.append(',');
 			}
 			fw.append('\n');
@@ -152,7 +157,8 @@ public class ClosestK {
 	}
 	
 	private static void logEnd(int n, int k, long ini) {
-		System.out.println(String.format("END   | n=%s and k=%s, tooked: %s ms", n, k, System.currentTimeMillis() - ini));
+		long elapsed = System.currentTimeMillis() - ini;
+		System.out.println(String.format("END   | n=%s and k=%s, tooked: %s ms (%s min(s))", n, k, elapsed, elapsed/60000));
 	}
 }
 
