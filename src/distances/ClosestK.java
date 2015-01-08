@@ -47,9 +47,9 @@ public class ClosestK {
 
 	public ClosestK(int n, int k, int from, int to, Hotel[] hotels) {
 
-		float[] distances = new float[n];
-		int[] hotelIndexes = IntStream.range(0, n).toArray();
-		Integer[] sortedResult = new Integer[k];
+		final float[] distances = new float[n];
+		final int[] hotelIndexes = IntStream.range(0, n).toArray();
+		final Integer[] sortedResult = new Integer[k];
 
 		try (final FileWriter fw = new FileWriter(new File("result.csv"))) {
 			
