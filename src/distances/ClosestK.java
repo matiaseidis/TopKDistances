@@ -33,7 +33,7 @@ public class ClosestK {
 		logBegin(hotels, k, threads);
 		for(int i=0; i<n; i+=segment) {
 			int from = i;
-			int to = i + segment - 1;
+			int to = i + segment;
 			results.add(pool.submit(() -> {
 				new ClosestK(n, k, from, to, hotels);
 				logSegment(from, to);
@@ -48,8 +48,8 @@ public class ClosestK {
 	public ClosestK(int n, int k, int from, int to, Hotel[] hotels) {
 
 		float[] distances = new float[n];
-		int[] hotelIndexes = new int[n];
-		IntStream.range(0, n).forEach(i -> hotelIndexes[i] = i);
+		int[] hotelIndexes = IntStream.range(0, n).toArray();
+		Integer[] sortedResult = new Integer[k];
 
 		try (final FileWriter fw = new FileWriter(new File("result.csv"))) {
 			
@@ -63,14 +63,10 @@ public class ClosestK {
 				// calculate top k nearest on hotelIndexes
 				topK(k, hotelIndexes, distances);
 				// sort the top k nearest
-				Integer[] topKIndexes = Arrays
-						.stream(hotelIndexes)
-						.boxed()
-						.limit(k)
-						.sorted((a,b) -> Float.compare(distances[a],distances[b]))
-						.toArray(Integer[]::new);
+				IntStream.range(0,  k).forEach(e -> sortedResult[e] = hotelIndexes[e]);
+				Arrays.sort(sortedResult, 0, k, (a,b) -> Float.compare(distances[a],distances[b]));
 				// print result
-				writeToCSV(k, fw, h.id, topKIndexes);
+				writeToCSV(k, fw, h.id, sortedResult);
 
 				logStep(i, ini);
 					
