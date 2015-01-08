@@ -3,6 +3,7 @@ package distances;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -61,6 +62,8 @@ public class ClosestK {
 				euclideanDistances(h, hotels, distances);
 				// calculate top k nearest on hotelIndexes
 				topK(k, hotelIndexes, distances);
+				// sort the top k nearest
+				Arrays.sort(hotelIndexes, 0, k+1);
 				// print result
 				writeToCSV(k, fw, h.id, hotelIndexes);
 
